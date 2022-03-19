@@ -1,8 +1,10 @@
+import sys, urllib, os
+
 from pytube import YouTube
+
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtSql, uic, QtCore
-import sys, urllib, os
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QPixmap, QMovie, QImage
 
@@ -12,26 +14,31 @@ class YtDetailThread(QThread):
 
     def __init__(self):
         super(YtDetailThread, self).__init__()
-        self.yt_url = ''
-        self.yt_title = ''
+
+        self.yt_url       = ''
+        self.yt_title     = ''
         self.yt_thumbnail = ''
 
     @pyqtSlot(str, bytes)
     def run(self):
         try:
-            self.yt_title = self.getyttitle(self.yt_url)
+            self.yt_title     = self.getyttitle(self.yt_url)
             self.yt_thumbnail = self.getytthumbnail(self.yt_url)
+            
             self.ytsgl.emit(self.yt_title, self.yt_thumbnail)
         except:
             self.ytsglException.emit(str(sys.exc_info()[1]))
 
     def getytthumbnail(self, url):
         yt = YouTube(url)
-        tempurl = 'https://i.ytimg.com/vi/'+yt.video_id+'/default.jpg'
+
+        tempurl = 'https://i.ytimg.com/vi/' + yt.video_id + '/default.jpg'
+
         return urllib.request.urlopen(tempurl).read()
 
     def getyttitle(self, url):
         yt = YouTube(url)
+
         return yt.title
 
 ########################################################################
@@ -45,16 +52,16 @@ class YtDownloadThread(QThread):
 
     def __init__(self):
         super(YtDownloadThread, self).__init__()
-        self.yt_url = ""
+
+        self.yt_url      = ""
         self.yt_savepath = ""
-        self.yt_quality = ""
+        self.yt_quality  = ""
 
     @pyqtSlot(str)
     def run(self):
-        self.downloadyt(self.yt_url,self.yt_savepath, self.yt_quality)
+        self.downloadyt(self.yt_url, self.yt_savepath, self.yt_quality)
 
     def downloadyt(self, url, pth, qual):
-
         yt = YouTube(url)
         yt.register_on_progress_callback(self.progress_bar)
 
@@ -102,15 +109,17 @@ class YtDownloadThread(QThread):
 ##################################################################
 
 class MyWindow(QMainWindow):
-
-    yturl = ""
-    ytviews = ""
+    yturl    = ""
+    ytviews  = ""
     ytlength = ""
 
     def __init__(self):
         super(MyWindow, self).__init__()
+        
         uic.loadUi('main.ui', self)
+        
         self.temp = 0
+        
         self.ytthread = YtDetailThread()
         self.ytthread.ytsgl.connect(self.finished)
         self.ytthread.ytsglException.connect(self.exceptionhandle)
@@ -122,6 +131,7 @@ class MyWindow(QMainWindow):
         self.savepath = os.path.expanduser("~\Desktop")
         self.locationpath.setText(self.savepath)
         self.dwnld.setEnabled(False)
+        
         self.show()
 
 
@@ -147,9 +157,11 @@ class MyWindow(QMainWindow):
     def on_dwnld_clicked(self):
         self.console.append("Starting download....")
         self.console.append("<span style='color:orange'>If downloading not start in few 10 seconds try <b>Best Available</b> in Quality</span>")
-        self.ytdwlthread.yt_url = self.urlinput.text()
+        
+        self.ytdwlthread.yt_url      = self.urlinput.text()
         self.ytdwlthread.yt_savepath = self.savepath
-        self.ytdwlthread.yt_quality = self.qualitycheck.itemText(self.qualitycheck.currentIndex())
+        self.ytdwlthread.yt_quality  = self.qualitycheck.itemText(self.qualitycheck.currentIndex())
+        
         self.ytdwlthread.start()
 
     def finished(self, yttitle,ytthumbnail):
