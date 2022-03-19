@@ -23,8 +23,6 @@ class YtDetailThread(QThread):
     def run(self):
         try:
             self.yt_title     = self.getyttitle(self.yt_url)
-            print(self.yt_title)
-
             self.yt_thumbnail = self.getytthumbnail(self.yt_url)
             
             self.ytsgl.emit(self.yt_title, self.yt_thumbnail)
@@ -171,13 +169,15 @@ class MyWindow(QMainWindow):
         
         self.ytdwlthread.start()
 
-    def finished(self, yttitle,ytthumbnail):
+    def finished(self, yttitle, ytthumbnail):
         self.ytitle.setText(yttitle)  # Show the output to the user
         self.console.append("Response received!")
+        self.console.append(f'Title: {yttitle}')
+        
         image = QImage()
         image.loadFromData(ytthumbnail)
 
-        rect = QRect(0,12,120,66)
+        rect = QRect(0, 12, 120, 66)
         image = image.copy(rect)
 
         self.thumbnail.setPixmap(QPixmap(image))
