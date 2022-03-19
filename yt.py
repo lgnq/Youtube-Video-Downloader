@@ -3,10 +3,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5 import QtSql, uic, QtCore
 import sys, urllib, os
-import webbrowser
 from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QPixmap, QMovie, QImage
-import ffmpeg
 
 class YtDetailThread(QThread):
     ytsgl = QtCore.pyqtSignal(str,bytes)
