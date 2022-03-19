@@ -9,7 +9,7 @@ from PyQt5.QtCore import QThread
 from PyQt5.QtGui import QPixmap, QMovie, QImage
 
 class YtDetailThread(QThread):
-    ytsgl = QtCore.pyqtSignal(str,bytes)
+    ytsgl = QtCore.pyqtSignal(str, bytes)
     ytsglException = QtCore.pyqtSignal(str)
 
     def __init__(self):
@@ -23,6 +23,8 @@ class YtDetailThread(QThread):
     def run(self):
         try:
             self.yt_title     = self.getyttitle(self.yt_url)
+            print(self.yt_title)
+
             self.yt_thumbnail = self.getytthumbnail(self.yt_url)
             
             self.ytsgl.emit(self.yt_title, self.yt_thumbnail)
@@ -138,14 +140,19 @@ class MyWindow(QMainWindow):
     @pyqtSlot()
     def on_fetchbtn_clicked(self):
         self.temp = 0
+        
         self.progressBar.setValue(0)
+        
         self.ytthread.yt_url = self.urlinput.text()
         self.console.append("<span style='color:red'>Initializing links..</span>")
+        
         movie = QMovie("icon/loading.gif")
         self.thumbnail.setMovie(movie)
         movie.start()
+        
         self.console.append("URL " + str(self.ytthread.yt_url))
         self.console.append("Waiting for response ..........")
+        
         self.ytthread.start()
 
     @pyqtSlot()
